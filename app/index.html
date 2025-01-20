@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <header class="app-header">
+      <div class="header-left">
+        <h1>Email Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <button id="infoBtn" class="icon-btn">⚙️ Settings</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <nav>
+          <ul>
+            <li class="sidebar-item active">Overview</li>
+            <li class="sidebar-item">Inbox</li>
+            <li class="sidebar-item">Categories</li>
+            <li class="sidebar-item">Settings</li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Section -->
+      <section class="content">
+        <!-- Top Categories -->
+        <div class="categories fade-in">
+          <h2>Top Categories</h2>
+          <div class="category-card hover-scale">
+            <h3>Work</h3>
+            <p>You have 8 emails. 2 require urgent responses.</p>
+            <button class="action-btn">View Emails</button>
+          </div>
+          <div class="category-card hover-scale">
+            <h3>Personal</h3>
+            <p>3 new emails from family. One needs a reply.</p>
+            <button class="action-btn">Respond</button>
+          </div>
+          <div class="category-card hover-scale">
+            <h3>Promotions</h3>
+            <p>5 new promotional emails. 2 offers expiring soon.</p>
+            <button class="action-btn">Check Offers</button>
+          </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary fade-in">
+          <h2>Summary</h2>
+          <div class="summary-buttons">
+            <button class="summary-btn active" data-range="3">Last 3 Days</button>
+            <button class="summary-btn" data-range="7">Last 1 Week</button>
+            <button class="summary-btn" data-range="30">Last 1 Month</button>
+          </div>
+          <p id="summaryText">Today: 16 emails received. Inbox at 75% capacity.</p>
+        </div>
+
+        <!-- Query Section -->
+        <div class="query fade-in">
+          <h2>Ask about your Emails</h2>
+          <textarea id="queryInput" placeholder="Type a query..."></textarea>
+          <button id="submitQueryBtn" class="primary-btn hover-scale">Submit</button>
+          <p id="queryResponse" class="response"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2>Customize Dashboard</h2>
+      <textarea id="customPrompt" placeholder="Add customization..."></textarea>
+      <button id="saveModalBtn" class="primary-btn hover-scale">Save</button>
+      <button id="closeModalBtn" class="secondary-btn hover-scale">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

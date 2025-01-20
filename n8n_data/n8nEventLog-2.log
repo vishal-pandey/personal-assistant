@@ -1,0 +1,2 @@
+{"__type":"$$EventMessageAudit","id":"894c7c19-e853-4942-9708-796927e69955","ts":"2025-01-20T10:48:33.342+00:00","eventName":"n8n.audit.workflow.created","message":"n8n.audit.workflow.created","payload":{"userId":"31c293be-b7ce-4dab-9629-f5c8d0639e87","_email":"vishal.pandey@lumiq.ai","_firstName":"Vishal","_lastName":"Pandey","globalRole":"global:owner","workflowId":"OdzFBs4LqrHPmE6q","workflowName":"My workflow"}}
+{"__type":"$$EventMessageConfirm","confirm":"894c7c19-e853-4942-9708-796927e69955","ts":"2025-01-20T10:48:33.360+00:00","source":{"id":"0","name":"eventBus"}}

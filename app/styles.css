@@ -1,0 +1,247 @@
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  overflow: hidden;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+.app-header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 200px;
+  background: #222;
+  color: #fff;
+  padding: 20px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-item {
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 5px;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.sidebar-item:hover,
+.sidebar-item.active {
+  background-color: #444;
+  transform: scale(1.02);
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.categories, .query {
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.categories {
+  animation-delay: 0.2s;
+}
+
+.query {
+  animation-delay: 0.6s;
+}
+
+.summary {
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.6s ease forwards;
+  animation-delay: 0.4s;
+}
+
+h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.category-card {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s, transform 0.2s;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+button {
+  cursor: pointer;
+  font-size: 12px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+}
+
+.secondary-btn {
+  background-color: #ddd;
+  color: #333;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.secondary-btn.hover-scale:hover {
+  background-color: #bbb;
+  transform: scale(1.05);
+}
+
+.primary-btn {
+  background-color: #444;
+  color: #fff;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.primary-btn.hover-scale:hover {
+  background-color: #222;
+  transform: scale(1.05);
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+
+textarea:focus, input[type="text"]:focus {
+  border-color: #666;
+  box-shadow: 0 0 5px rgba(102, 102, 102, 0.5);
+}
+
+textarea:hover, input[type="text"]:hover {
+  border-color: #aaa;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  animation: scaleIn 0.4s ease;
+}
+
+.response {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #333;
+}
+
+.summary-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.summary-tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border: 1px solid transparent;
+  border-radius: 5px 5px 0 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+.summary-tab:hover {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.summary-tab.active {
+  background-color: #fff;
+  color: #333;
+  border-color: #ddd #ddd transparent;
+}
+
+.summary-content {
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

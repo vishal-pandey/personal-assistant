@@ -1,0 +1,389 @@
+{
+  "name": "Email Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "output": "fields",
+        "fields": [
+          "body",
+          "subject",
+          "conversationId",
+          "from"
+        ],
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        0
+      ],
+      "id": "81b1ddee-71e6-41a3-a981-64c7c904d9f8",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qycpdxc1tDr6kPTm",
+          "name": "Microsoft Outlook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Hi My name is Vishal Pandey,\nI work in Lumiq as team lead, \nI work on blackrock project, my day to day activity is to coordinate with the team. Given the subject and body of the email, I want to provide me the relevancy rating between 1 to 5, 1 being the least important or relevent and 5 being the most important. please provide only single rating for an email.\n\nThere is one exception, if the tone of the email is excalation, where any client is complaining about the project or team, give it the an special rating of 7 this is most important email for me.\n\nBody of the email is in html format, so you need to take care of that.\n\nSubject : {{ $json.subject }}\nBody : {{ $json.body.content }}\n\n\nBelow is the conversationId and id of the email, I want these two also in the response please include these along with the rating.\n\nconversationId : {{ $json.conversationId }}\n\nid : {{ $json.id }}\n\nPlease provide the output in the format\n\ncoversationId : <put conversationId here> \nid : <put id in here>\n\nrelevancyRating : <provide rating in here>\n\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.7,
+      "position": [
+        -80,
+        -40
+      ],
+      "id": "ac1be6d9-43b8-4b05-ade8-331c1a6e5a7f",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "vBB30TUTijN7mlaG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.content.relevancyRating }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ea73c176-f188-4ac9-99bf-b2ca83598925",
+                    "leftValue": "={{ 0 }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "82159c98-f95f-46ee-985e-711453e9c5a6",
+                    "leftValue": "={{ $json.message.content.relevancyRating }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        280,
+        -40
+      ],
+      "id": "4ad9d3e8-3f16-438e-ac3f-b945b910336d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6331f501-2537-45be-9a63-5e3e929996c2",
+              "leftValue": "={{ $json.from.emailAddress.address }}",
+              "rightValue": "vishal.pandey@lumiq.ai",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -340,
+        0
+      ],
+      "id": "69faec0a-b852-4462-ada5-fc489099cc5c",
+      "name": "Email is not from my email"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $json.message.content.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA=",
+          "mode": "list",
+          "cachedResultName": "excalation",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA%3D"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        -220
+      ],
+      "id": "11c68687-ca80-41a7-9d5f-04f3b41715be",
+      "name": "Escalation",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qycpdxc1tDr6kPTm",
+          "name": "Microsoft Outlook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $json.message.content.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA=",
+          "mode": "list",
+          "cachedResultName": "ImportantMessages",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA%3D"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        -40
+      ],
+      "id": "a1829d3d-3ef6-4f36-9067-430ec063cfe2",
+      "name": "Important Email",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qycpdxc1tDr6kPTm",
+          "name": "Microsoft Outlook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $json.message.content.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA=",
+          "mode": "list",
+          "cachedResultName": "NotImportantMessage",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA%3D"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        140
+      ],
+      "id": "94642a40-5319-4389-8032-b857f01650de",
+      "name": "Not Important Message",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qycpdxc1tDr6kPTm",
+          "name": "Microsoft Outlook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $json.message.content.id }}",
+          "mode": "id"
+        },
+        "message": "Thank you for bringing it to my notice, I am looking into it, will get back to you on this shortly.\n\nThanks \nVishal Pandey",
+        "options": {
+          "saveAsDraft": true
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        -420
+      ],
+      "id": "a525186b-173f-4733-8733-9d738ba74bc0",
+      "name": "Save the response as draft",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qycpdxc1tDr6kPTm",
+          "name": "Microsoft Outlook account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Email is not from my email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Escalation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save the response as draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Important Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Important Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email is not from my email": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "62d6a12f-e53d-432a-9a91-58046164f0f7",
+  "meta": {
+    "instanceId": "541d1999417c80ced25688329ce3c877c1daaa6ea45cfda5f0c496cc3e994a92"
+  },
+  "id": "kr44ZwjjXuKPZiJI",
+  "tags": []
+}
