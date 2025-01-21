@@ -1,4 +1,4 @@
-CREATE TABLE n8n_db.public.message (
+CREATE TABLE postgres.public.message (
   id text NOT NULL,
   created_date_time timestamp NULL,
   last_modified_date_time timestamp NULL,
