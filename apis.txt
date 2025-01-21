@@ -1,0 +1,3 @@
+GET all the categories of the emails present https://n8n.vishalpandey.co.in/webhook/get-category
+GET all the tags of the email present in the system https://n8n.vishalpandey.co.in/webhook/get-tags
+POST get email by category https://n8n.vishalpandey.co.in/webhook/emails-by-category { "category": "fyi" }
