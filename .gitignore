@@ -2,3 +2,4 @@ env
 dist
 build
 postgres_data
+n8n_data/*.log
