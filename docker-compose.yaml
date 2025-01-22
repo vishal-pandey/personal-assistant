@@ -7,6 +7,8 @@ services:
     ports:
       - "8000:8000"
     container_name: chat_app
+    depends_on:
+      - n8n
 
   n8n:
     image: n8nio/n8n:latest
