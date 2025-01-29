@@ -9,6 +9,7 @@ chatUrl = "http://n8n:5678/webhook/chat"
 promptGet = "http://n8n:5678/webhook/get-category-tag-preference"
 promptSet = "http://n8n:5678/webhook/category-tag-preference"
 
+
 @cl.on_chat_start
 async def start():
 
@@ -22,6 +23,7 @@ async def start():
         ]
     ).send()
     value = settings["category-and-tag-prompt"]
+    await cl.Message(content=f"LLM Prompt updated").send()
 
 
 # Listen for updates to the settings
