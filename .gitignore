@@ -3,3 +3,4 @@ dist
 build
 postgres_data
 n8n_data/*.log
+__pycache__

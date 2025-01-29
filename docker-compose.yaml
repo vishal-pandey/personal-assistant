@@ -21,12 +21,16 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      - N8N_ENABLE_CREDENTIALS_FEATURES=true
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=postgres
       - DB_POSTGRESDB_USER=postgres
       - DB_POSTGRESDB_PASSWORD=postgres
+      - MS_CLIENT_SECRET=<client-secret>
+      - LLM_KEY=<your-chatgpt-token>
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,6 +38,7 @@ services:
       /bin/sh -c "
       n8n import:workflow --input=/home/node/.n8n/data/workflows.json &&
       n8n import:credentials --input=/home/node/.n8n/data/credentials.json &&
+      n8n update:workflow --all --active=true &&
       n8n start
       "
 

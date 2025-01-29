@@ -1,1 +1,2487 @@
-[{"createdAt":"2025-01-21T06:39:22.461Z","updatedAt":"2025-01-21T22:08:53.081Z","id":"9cyDAxwnZGQxehYC","name":"API All Category","active":false,"nodes":[{"parameters":{"path":"get-category","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"e612883f-0b2f-4a3c-8160-c6d81e25674c","name":"Webhook","webhookId":"bd349985-4ea0-4e8f-94cc-348683150cf6"},{"parameters":{"operation":"executeQuery","query":"SELECT DISTINCT (categories) from message;","options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[300,0],"id":"148cab1a-99f2-42f9-9836-5bf74abb8979","name":"Postgres","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1,"position":[20,160],"id":"cd251aa6-1e92-480d-ab96-ffe602ea5f88","name":"Execute Workflow Trigger"},{"parameters":{"jsCode":"let categories = [\n  {\n    \"categories\": []\n  }\n]\nfor (const item of $input.all()) {\n  categories[0][\"categories\"].push(item.json.categories[0])\n}\n\nreturn categories;"},"type":"n8n-nodes-base.code","typeVersion":2,"position":[520,0],"id":"54d477bc-3722-4280-8d2f-bcd980fbf05c","name":"Code","alwaysOutputData":true}],"connections":{"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]},"Execute Workflow Trigger":{"main":[[{"node":"Postgres","type":"main","index":0}]]},"Postgres":{"main":[[{"node":"Code","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"78774ddf-7ffe-403b-9cb9-91eadba4477c","triggerCount":1,"tags":[]},{"createdAt":"2025-01-22T09:27:03.208Z","updatedAt":"2025-01-22T09:38:35.184Z","id":"0lLclNsot3gJcIdO","name":"API GET Category Tag Preference","active":false,"nodes":[{"parameters":{"path":"get-category-tag-preference","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"2bcd3dc3-5ef9-4cb6-be0f-322e44ba89cd","name":"Webhook","webhookId":"fa7c376c-7f77-41e0-a8ca-4a14c527f53a"},{"parameters":{"operation":"select","schema":{"__rl":true,"mode":"list","value":"public"},"table":{"__rl":true,"value":"configuration","mode":"list","cachedResultName":"configuration"},"limit":1,"where":{"values":[{"column":"id","value":"1"}]},"options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"e796eab2-d7da-4750-aa48-257a98cf59a0","name":"Postgres","credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}}],"connections":{"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":{"templateCredsSetupCompleted":true},"pinData":{},"versionId":"c8eacfdd-1e72-4d64-915d-fe2ea0dbac4e","triggerCount":1,"tags":[]},{"createdAt":"2025-01-21T19:53:19.208Z","updatedAt":"2025-01-21T22:07:40.429Z","id":"yA4oJOzfXvXiB6jo","name":"Get Draft By Id","active":false,"nodes":[{"parameters":{"operation":"executeQuery","query":"SELECT \n    id AS message_id,\n    subject,\n    draft AS draft_message,\n    sender_name,\n    sender_email,\n    created_date_time,\n    last_modified_date_time\nFROM \n    message\nWHERE \n    id = '{{ $json.query.message_id }}'\n    AND draft IS NOT NULL; -- Ensures only messages with a draft are fetched\n","options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"711f3819-b0ad-4802-a5e1-c22e5a06294c","name":"Postgres","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1,"position":[-20,0],"id":"c0dc6323-ace3-47a2-845e-0fce6d1b712c","name":"Execute Workflow Trigger"}],"connections":{"Execute Workflow Trigger":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"514e6a36-af80-40ad-8541-9c34377c8fb1","triggerCount":0,"tags":[]},{"createdAt":"2025-01-21T07:21:16.925Z","updatedAt":"2025-01-27T08:38:41.876Z","id":"3vu4056ja4IhGnOM","name":"Agentic Chat","active":true,"nodes":[{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.chatTrigger","typeVersion":1.1,"position":[0,0],"id":"79390179-a73a-4550-a13c-7586e40cf127","name":"When chat message received","webhookId":"345f0a46-edbc-4149-9f6b-5a858f1a2bb2"},{"parameters":{"promptType":"define","text":"={{ $json.chatInput || $json.body.chatInput }}","options":{}},"type":"@n8n/n8n-nodes-langchain.agent","typeVersion":1.7,"position":[220,0],"id":"064830a7-88aa-4c5d-9efe-c47d5cfe8d42","name":"AI Agent"},{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.lmChatOpenAi","typeVersion":1,"position":[0,280],"id":"56a2ad10-635b-462a-8857-44ccfbe7745e","name":"OpenAI Chat Model","credentials":{"openAiApi":{"id":"NZ9xRrz90HRGXtTn","name":"OpenAi account"}}},{"parameters":{"sessionIdType":"customKey","sessionKey":"{{ $json.sessionId || $json.body.sessionId }}"},"type":"@n8n/n8n-nodes-langchain.memoryBufferWindow","typeVersion":1.3,"position":[140,280],"id":"d46e519b-3e3f-4ab7-9ac4-73c17c827afe","name":"Window Buffer Memory"},{"parameters":{"name":"get_categories","description":"Call this tool when user ask about the categories present.","workflowId":{"__rl":true,"value":"9cyDAxwnZGQxehYC","mode":"list","cachedResultName":"API All Category"}},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":1.3,"position":[280,280],"id":"6bc99b6d-6f38-4810-9c40-c94bcc671927","name":"Get Categories","notesInFlow":true,"notes":"Get all the categories"},{"parameters":{"name":"unread_emails","description":"Call this tool to get all the recent unread emails","workflowId":{"__rl":true,"value":"X7HA4dMNUjqrnTvi","mode":"list","cachedResultName":"API Last Unread Emails"}},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":1.3,"position":[440,280],"id":"9ef86e30-a0e3-450b-a979-3697fc9f5a69","name":"Get unread emails"},{"parameters":{"name":"email_by_category","description":"Call this node to get the emails of any specific category, for this tool to work it expect the category name in the below format,\nin the json format.\n\n{\n  \"category\": \"<category_name>\"\n}","workflowId":{"__rl":true,"value":"trzzCjdYb447Rl6D","mode":"list","cachedResultName":"emails by category"},"specifyInputSchema":true,"jsonSchemaExample":"{\n\t\"category\": \"<category_name>\"\n}"},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":1.3,"position":[740,280],"id":"275a136e-f090-41eb-9a31-68919d6cd02a","name":"email by category"},{"parameters":{"name":"draft_by_message_id","description":"Call this tool to get the draft of email by message id","workflowId":{"__rl":true,"value":"yA4oJOzfXvXiB6jo","mode":"list","cachedResultName":"Email By Id"},"specifyInputSchema":true,"jsonSchemaExample":"{\n\t\"message_id\": \"<message_id>\"\n}"},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":1.3,"position":[900,280],"id":"18ac4fdc-cf19-4bd6-8a87-cbd4e945b07b","name":"Draft Email By Id"},{"parameters":{"httpMethod":"POST","path":"chat","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,-200],"id":"c29ea089-113a-455d-b872-5f09eaf5f22b","name":"Webhook","webhookId":"9a3d2af6-c8c6-4db6-aa40-c237cd0c174f"},{"parameters":{"name":"get_tags","description":"Call this tool to get the tags present.","workflowId":{"__rl":true,"value":"q93DYBjuCrYRKmTZ","mode":"list","cachedResultName":"API Get All Tags"}},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":1.3,"position":[600,280],"id":"a4a876cf-bca6-4a51-b5de-301f120778f4","name":"Get tags"},{"parameters":{"name":"Calendar_summary","description":"Call this node to get the summary of today calendar events.","workflowId":{"__rl":true,"value":"WHFctQ43gAm2v6vm","mode":"list","cachedResultName":"Fetch Calendar"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}},"type":"@n8n/n8n-nodes-langchain.toolWorkflow","typeVersion":2,"position":[1060,280],"id":"803f3f53-f1db-4ad4-9664-f9c09babe224","name":"Call n8n Workflow Tool"}],"connections":{"When chat message received":{"main":[[{"node":"AI Agent","type":"main","index":0}]]},"OpenAI Chat Model":{"ai_languageModel":[[{"node":"AI Agent","type":"ai_languageModel","index":0}]]},"Window Buffer Memory":{"ai_memory":[[{"node":"AI Agent","type":"ai_memory","index":0}]]},"Get Categories":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"Get unread emails":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"email by category":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"Draft Email By Id":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"Webhook":{"main":[[{"node":"AI Agent","type":"main","index":0}]]},"Get tags":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]},"Call n8n Workflow Tool":{"ai_tool":[[{"node":"AI Agent","type":"ai_tool","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"7c58756c-ff67-4868-8503-3b90de60d85d","triggerCount":3,"tags":[]},{"createdAt":"2025-01-14T10:49:31.232Z","updatedAt":"2025-01-27T08:34:16.300Z","id":"9Dz5czowVEYquoTt","name":"Email Automation","active":true,"nodes":[{"parameters":{"pollTimes":{"item":[{"mode":"everyMinute"}]},"output":"fields","fields":["body","subject","conversationId","from"],"filters":{},"options":{}},"type":"n8n-nodes-base.microsoftOutlookTrigger","typeVersion":1,"position":[-1080,420],"id":"4d8bd8d7-0bd6-4c57-ba0f-0c8da355801c","name":"Microsoft Outlook Trigger","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"modelId":{"__rl":true,"value":"gpt-4o-mini","mode":"list","cachedResultName":"GPT-4O-MINI"},"messages":{"values":[{"content":"=Hi My name is Vishal Pandey,\nI work in Lumiq as team lead, \nI work on blackrock project, my day to day activity is to coordinate with the team. Given the subject and body of the email, I want to provide me the relevancy rating between 1 to 5, 1 being the least important or relevent and 5 being the most important. please provide only single rating for an email.\n\nThere is one exception, if the tone of the email is excalation, where any client is complaining about the project or team, give it the an special rating of 7 this is most important email for me.\n\nBody of the email is in html format, so you need to take care of that.\n\nSubject : {{ $json.subject }}\nBody : {{ $json.body.content }}\n\n\nBelow is the conversationId and id of the email, I want these two also in the response please include these along with the rating.\n\nconversationId : {{ $json.conversationId }}\n\nid : {{ $json.id }}\n\nPlease provide the output in the format\n\ncoversationId : <put conversationId here> \nid : <put id in here>\n\nrelevancyRating : <provide rating in here>\n\n"}]},"jsonOutput":true,"options":{}},"type":"@n8n/n8n-nodes-langchain.openAi","typeVersion":1.7,"position":[-580,380],"id":"0408c36c-fe6c-4470-be02-bccacb7dccae","name":"OpenAI","credentials":{"openAiApi":{"id":"wkUTMF6yndJdP6LD","name":"OpenAi account"}}},{"parameters":{"rules":{"values":[{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"leftValue":"={{ $json.message.content.relevancyRating }}","rightValue":7,"operator":{"type":"number","operation":"equals"}}],"combinator":"and"}},{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"id":"ea73c176-f188-4ac9-99bf-b2ca83598925","leftValue":"={{ 0 }}","rightValue":3,"operator":{"type":"number","operation":"gt"}}],"combinator":"and"}},{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"id":"82159c98-f95f-46ee-985e-711453e9c5a6","leftValue":"={{ $json.message.content.relevancyRating }}","rightValue":3,"operator":{"type":"number","operation":"lte"}}],"combinator":"and"}}]},"options":{}},"type":"n8n-nodes-base.switch","typeVersion":3.2,"position":[-220,380],"id":"14d9f9f1-cec7-4326-8ba4-74c82e8c4353","name":"Switch"},{"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"id":"6331f501-2537-45be-9a63-5e3e929996c2","leftValue":"={{ $json.from.emailAddress.address }}","rightValue":"vishal.pandey@lumiq.ai","operator":{"type":"string","operation":"notEquals"}}],"combinator":"and"},"options":{}},"type":"n8n-nodes-base.if","typeVersion":2.2,"position":[-840,420],"id":"ee5f3e7c-65cb-4358-8ad2-b199a8421c01","name":"Email is not from my email"},{"parameters":{"operation":"move","messageId":{"__rl":true,"value":"={{ $json.message.content.id }}","mode":"id"},"folderId":{"__rl":true,"value":"AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA=","mode":"list","cachedResultName":"excalation","cachedResultUrl":"https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA%3D"}},"type":"n8n-nodes-base.microsoftOutlook","typeVersion":2,"position":[0,200],"id":"a7761a7e-14fb-49b4-a2bd-8f52eb0dd93d","name":"Escalation","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"operation":"move","messageId":{"__rl":true,"value":"={{ $json.message.content.id }}","mode":"id"},"folderId":{"__rl":true,"value":"AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA=","mode":"list","cachedResultName":"ImportantMessages","cachedResultUrl":"https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA%3D"}},"type":"n8n-nodes-base.microsoftOutlook","typeVersion":2,"position":[0,380],"id":"d6c4f407-1947-42ec-baa4-2f8e38f062f2","name":"Important Email","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"operation":"move","messageId":{"__rl":true,"value":"={{ $json.message.content.id }}","mode":"id"},"folderId":{"__rl":true,"value":"AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA=","mode":"list","cachedResultName":"NotImportantMessage","cachedResultUrl":"https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA%3D"}},"type":"n8n-nodes-base.microsoftOutlook","typeVersion":2,"position":[0,560],"id":"2eb48131-3cce-4666-9c04-2bce9050e490","name":"Not Important Message","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"operation":"reply","messageId":{"__rl":true,"value":"={{ $json.message.content.id }}","mode":"id"},"message":"Thank you for bringing it to my notice, I am looking into it, will get back to you on this shortly.\n\nThanks \nVishal Pandey","options":{"saveAsDraft":true}},"type":"n8n-nodes-base.microsoftOutlook","typeVersion":2,"position":[0,0],"id":"6ee5371e-a22b-441f-99f8-bf7c3cc6c47d","name":"Save the response as draft","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}}],"connections":{"Microsoft Outlook Trigger":{"main":[[{"node":"Email is not from my email","type":"main","index":0}]]},"OpenAI":{"main":[[{"node":"Switch","type":"main","index":0}]]},"Switch":{"main":[[{"node":"Escalation","type":"main","index":0},{"node":"Save the response as draft","type":"main","index":0}],[{"node":"Important Email","type":"main","index":0}],[{"node":"Not Important Message","type":"main","index":0}]]},"Email is not from my email":{"main":[[{"node":"OpenAI","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":{"node:Microsoft Outlook Trigger":{"lastTimeChecked":"2025-01-27T03:34:16.327-05:00"}},"meta":null,"pinData":{},"versionId":"80eaa430-6509-4ae6-be10-9d1dd86ad24c","triggerCount":1,"tags":[]},{"createdAt":"2025-01-21T06:56:31.265Z","updatedAt":"2025-01-21T22:08:37.298Z","id":"q93DYBjuCrYRKmTZ","name":"API Get All Tags","active":false,"nodes":[{"parameters":{"operation":"executeQuery","query":"SELECT DISTINCT UNNEST(tags)\nFROM message\nWHERE tags IS NOT NULL;","options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"04628bf1-3850-4ef7-b8ac-2750dc963038","name":"Postgres","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{"jsCode":"// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nlet data =  [{\n  \"tags\": []\n}]\n\nfor (const item of $input.all()) {\n  data[0][\"tags\"].push(item.json.unnest)\n}\n\nreturn data"},"type":"n8n-nodes-base.code","typeVersion":2,"position":[440,0],"id":"6084cf28-cd3a-4e88-abed-22fbda83ea7a","name":"Code","alwaysOutputData":true},{"parameters":{"path":"get-tags","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"a5e3d699-8ba3-4a6e-ad82-29390d95e5be","name":"Webhook","webhookId":"225a35c4-5f97-48f0-b626-2cccb9a45005"},{"parameters":{},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1,"position":[0,220],"id":"44de6221-4531-4fb1-a377-08ef0ad9f17c","name":"Execute Workflow Trigger"}],"connections":{"Postgres":{"main":[[{"node":"Code","type":"main","index":0}]]},"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]},"Execute Workflow Trigger":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"3554e137-4975-4905-8b97-51ec0785d1d9","triggerCount":1,"tags":[]},{"createdAt":"2025-01-27T06:13:05.706Z","updatedAt":"2025-01-27T08:34:06.006Z","id":"WHFctQ43gAm2v6vm","name":"Fetch Calendar","active":false,"nodes":[{"parameters":{"resource":"event","limit":30,"filters":{"custom":"=start/dateTime ge '{{ $json.message.content.StartDate }}' and start/dateTime lt '{{ $json.message.content.EndDate }}'"}},"type":"n8n-nodes-base.microsoftOutlook","typeVersion":2,"position":[680,-160],"id":"cae67cc8-d52d-474f-98d5-bb99fdb291f2","name":"Microsoft Outlook","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"modelId":{"__rl":true,"value":"gpt-4o","mode":"list","cachedResultName":"GPT-4O"},"messages":{"values":[{"content":"=Your job is to identify the date range the user is asking for based on the JSON.query: {{ $json.query }} and today's date: {{$now}} \n\nYou should return the date range in the form of two field\n\n\"StartDate\" : <start date time in the iso format>\n\"EndDate\": <end date in the form of iso format>\n\nIn the default case if no input is provided, give the date range to incorporate today only\n\nPlease stick to the given response only and do not output any thing else","role":"system"}]},"jsonOutput":true,"options":{}},"type":"@n8n/n8n-nodes-langchain.openAi","typeVersion":1.8,"position":[260,-200],"id":"9f6e2d3d-4a26-42fa-bdf8-dfa56ff0a65f","name":"OpenAI","credentials":{"openAiApi":{"id":"NZ9xRrz90HRGXtTn","name":"OpenAi account"}}},{"parameters":{"inputSource":"passthrough"},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1.1,"position":[0,-180],"id":"e3149f67-e46c-44c0-9c7a-848d866c6acf","name":"Workflow Input Trigger"},{"parameters":{"modelId":{"__rl":true,"value":"gpt-4o-mini","mode":"list","cachedResultName":"GPT-4O-MINI"},"messages":{"values":[{"content":"=You are a Calendar assistant and I need you to summarize my day by looking at the event in my calendar. Here are the events details\n\n{{$json.toJsonString()}}","role":"system"}]},"options":{}},"type":"@n8n/n8n-nodes-langchain.openAi","typeVersion":1.8,"position":[1160,-120],"id":"37b3e8ab-117f-4525-aa0d-d937115713d9","name":"OpenAI1","credentials":{"openAiApi":{"id":"NZ9xRrz90HRGXtTn","name":"OpenAi account"}}},{"parameters":{"assignments":{"assignments":[{"id":"fafd90da-d226-4c92-9745-609047fc3735","name":"subject","value":"={{ $json.subject }}","type":"string"},{"id":"cd365d61-d88d-4bee-b01e-207c89b01b19","name":"bodyPreview","value":"={{ $json.bodyPreview }}","type":"string"},{"id":"15eff04e-7abe-4e0a-b5d4-27bcb0dff32b","name":"webLink","value":"={{ $json.webLink }}","type":"string"},{"id":"b23942c1-feb7-4574-bd1a-e354ac72099b","name":"start.dateTime","value":"={{ $json.start.dateTime }}","type":"string"},{"id":"c7ac8545-cb3f-48bc-b462-1e6927d07b43","name":"end.dateTime","value":"={{ $json.end.dateTime }}","type":"string"},{"id":"069ddbc3-23d2-429b-a285-927c267314ca","name":"start.timeZone","value":"={{ $json.start.timeZone }}","type":"string"},{"id":"02eb1174-e93e-48cf-a734-5f6dc9533a85","name":"organizer.emailAddress.name","value":"={{ $json.organizer.emailAddress.name }}","type":"string"}]},"options":{}},"type":"n8n-nodes-base.set","typeVersion":3.4,"position":[900,-160],"id":"eea1993a-68a2-4cfb-a848-7eadb36d14b9","name":"Edit Fields"},{"parameters":{"aggregate":"aggregateAllItemData","options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[1520,-120],"id":"a6af6dd6-fe7f-4c82-9eaa-f0fb0ad1d07f","name":"Aggregate"}],"connections":{"Microsoft Outlook":{"main":[[{"node":"Edit Fields","type":"main","index":0}]]},"Workflow Input Trigger":{"main":[[{"node":"OpenAI","type":"main","index":0}]]},"OpenAI":{"main":[[{"node":"Microsoft Outlook","type":"main","index":0}]]},"Edit Fields":{"main":[[{"node":"OpenAI1","type":"main","index":0}]]},"OpenAI1":{"main":[[{"node":"Aggregate","type":"main","index":0}]]},"Aggregate":{"main":[[]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":{"templateCredsSetupCompleted":true},"pinData":{},"versionId":"bcdd0213-ae4a-4040-a270-b42573ff2a13","triggerCount":0,"tags":[]},{"createdAt":"2025-01-21T07:11:55.517Z","updatedAt":"2025-01-21T21:09:15.000Z","id":"trzzCjdYb447Rl6D","name":"emails by category","active":false,"nodes":[{"parameters":{"httpMethod":"POST","path":"emails-by-category","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"ecfd934c-6f6a-4749-92ce-11dfac28ab56","name":"Webhook","webhookId":"6b402d9f-6387-4765-97b6-becd620ba3d8"},{"parameters":{"operation":"executeQuery","query":"SELECT \n    id AS message_id,\n    subject,\n    summary,\n    sender_name,\n    sender_email,\n    sent_date_time,\n    categories,\n    web_link,\n    tags,\n    draft as ai_generated_email_response_draft\nFROM \n    message\nWHERE \n    '{{ $json.query.category.toLowerCase() }}' = ANY(categories)\n    or '{{ $json.query.category.toLowerCase() }}' = ANY(tags)\nORDER BY \n    sent_date_time DESC;","options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"414d6721-4e29-4ada-a7ab-25e3e5def00c","name":"Postgres","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1,"position":[40,220],"id":"ca963a48-8777-4a2f-8c5d-a5e66b6ecad5","name":"Execute Workflow Trigger"}],"connections":{"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]},"Execute Workflow Trigger":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"b2bf8ab3-ad71-4f91-8b8d-b38c29ee87da","triggerCount":1,"tags":[]},{"createdAt":"2025-01-21T07:18:16.552Z","updatedAt":"2025-01-21T22:07:19.503Z","id":"X7HA4dMNUjqrnTvi","name":"API Last Unread Emails","active":false,"nodes":[{"parameters":{"path":"latest-unread-emails","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"22bf31e7-e5b7-4f1e-8693-025394a67ccf","name":"Webhook","webhookId":"8449ee32-3c91-4a08-8f13-84124618317d"},{"parameters":{"operation":"executeQuery","query":"SELECT \n    id AS message_id,\n    subject,\n    summary,\n    sender_name,\n    sender_email,\n    sent_date_time,\n    categories,\n    web_link,\n    tags,\n    draft as ai_generated_email_response_draft\nFROM \n    message\nWHERE \n    is_read = FALSE -- Filters only unread emails\nORDER BY \n    sent_date_time DESC; -- Orders emails by sent time, latest first\n","options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"09dc644e-1a83-42de-a007-841895c8edb7","name":"Postgres","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{},"type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1,"position":[-120,180],"id":"4b1597e7-53a3-48ce-b02c-f1a773827694","name":"Execute Workflow Trigger"}],"connections":{"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]},"Execute Workflow Trigger":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":null,"pinData":{},"versionId":"bb40cde5-85fe-4751-8572-a972bcd558b9","triggerCount":1,"tags":[]},{"createdAt":"2025-01-22T09:28:30.394Z","updatedAt":"2025-01-22T09:38:36.196Z","id":"WszbKjRL01cYL2r5","name":"API POST Category Tag Preference","active":false,"nodes":[{"parameters":{"httpMethod":"POST","path":"category-tag-preference","responseMode":"lastNode","responseData":"allEntries","options":{}},"type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"id":"f1bab611-76a3-42a7-9458-ce6248496d8b","name":"Webhook","webhookId":"21834462-3da9-4131-bcfb-6a1a9fff2513"},{"parameters":{"operation":"upsert","schema":{"__rl":true,"mode":"list","value":"public"},"table":{"__rl":true,"value":"configuration","mode":"list","cachedResultName":"configuration"},"columns":{"mappingMode":"defineBelow","value":{"config_key":"category-tag-config","config_value":"={{ $json.body.prompt }}","id":1},"matchingColumns":["id"],"schema":[{"id":"id","displayName":"id","required":false,"defaultMatch":true,"display":true,"type":"number","canBeUsedToMatch":true,"removed":false},{"id":"config_key","displayName":"config_key","required":true,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":false},{"id":"config_value","displayName":"config_value","required":true,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":false},{"id":"created_at","displayName":"created_at","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":false,"removed":true},{"id":"updated_at","displayName":"updated_at","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":false,"removed":true}],"attemptToConvertTypes":false,"convertFieldsToString":false},"options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[220,0],"id":"14b63a8c-9908-4180-a495-ffde00f15de6","name":"Postgres","credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}}],"connections":{"Webhook":{"main":[[{"node":"Postgres","type":"main","index":0}]]}},"settings":{"executionOrder":"v1"},"staticData":null,"meta":{"templateCredsSetupCompleted":true},"pinData":{},"versionId":"f4ef8d53-198f-4864-82cf-7f04f9e117f5","triggerCount":1,"tags":[]},{"createdAt":"2025-01-18T05:22:58.437Z","updatedAt":"2025-01-22T10:26:33.578Z","id":"uqjbDkf5gZQvaSFq","name":"Email Processer","active":false,"nodes":[{"parameters":{"pollTimes":{"item":[{"mode":"everyMinute"}]},"output":"fields","fields":["body","toRecipients","ccRecipients","subject","internetMessageId","conversationId","from","bodyPreview","categories","createdDateTime","importance","isRead","lastModifiedDateTime","receivedDateTime","replyTo","sender","sentDateTime","webLink","bccRecipients"],"filters":{},"options":{"downloadAttachments":true}},"type":"n8n-nodes-base.microsoftOutlookTrigger","typeVersion":1,"position":[-260,20],"id":"deb514f0-c4ef-4753-9939-8453724fbadd","name":"Microsoft Outlook Trigger","credentials":{"microsoftOutlookOAuth2Api":{"id":"jImBHIr3dzXoRQP8","name":"Microsoft Outlook account"}}},{"parameters":{"operation":"select","schema":{"__rl":true,"mode":"list","value":"public"},"table":{"__rl":true,"value":"message","mode":"list","cachedResultName":"message"},"limit":1,"where":{"values":[{"column":"conversation_id","value":"={{ $json.conversationId }}"}]},"sort":{"values":[{"column":"received_date_time","direction":"DESC"}]},"options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[-60,-220],"id":"83478a67-e43d-4d51-be3f-ba946a42d15b","name":"Postgres1","alwaysOutputData":true,"credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{"aggregate":"aggregateAllItemData","options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[380,-220],"id":"fa4bc487-8a43-41c9-b9bb-5a9606e1187f","name":"Aggregate"},{"parameters":{"options":{"summarizationMethodAndPrompts":{"values":{"summarizationMethod":"stuff","prompt":"=I am giving you the summary of the previous conversation and the email received latest, please give the combined summary of the conversation.\n\nIt May Happen that there no prevous conversation in thread so the summary of the previous conversation may be empty.\n\nMake sure you include the key details like who sent the email when it was received who are the intend people it should respond to etc.\n\nPlease give the output simply without any extra text and annotation, also remove the part which is not necesarry like disclamers.\n\n\nPrevious Conversation Summary : {{ $json.data[0].toJsonString().replaceAll(\"{\", \"(\").replaceAll(\"}\", \")\") }}\n\nCurrent Email : \n\n{{ $json.data[1].toJsonString().replaceAll(\"{\", \"(\").replaceAll(\"}\", \")\") }}\n\nGive the summary without any annotation in plain text. And give the output as combined summary of the conversation.\n\nSummary : "}}}},"type":"@n8n/n8n-nodes-langchain.chainSummarization","typeVersion":2,"position":[600,-220],"id":"1d6aefcb-67e5-4208-83a2-cdfbaff4bcf3","name":"Summarization Chain"},{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.lmChatOpenAi","typeVersion":1,"position":[700,0],"id":"9111cab8-c8ff-40ac-9d33-c2c7eead960c","name":"OpenAI Chat Model","credentials":{"openAiApi":{"id":"wYisOve6Vp7jhAbK","name":"OpenAi account"}}},{"parameters":{"numberInputs":3},"type":"n8n-nodes-base.merge","typeVersion":3,"position":[980,120],"id":"5a88be17-0bf3-4d8c-bf49-1a8c1d4dd311","name":"Merge"},{"parameters":{"aggregate":"aggregateAllItemData","options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[1220,120],"id":"a3bee814-c92d-4761-b7bf-bf52c2550ae9","name":"Aggregate1"},{"parameters":{"modelId":{"__rl":true,"value":"gpt-4o-mini","mode":"list","cachedResultName":"GPT-4O-MINI"},"messages":{"values":[{"content":"={{ $json.data[2].config_value }}\n\nSummary : {{ $json.data[0].response.text }}\nAPI Response : {{ $json.data[1].toJsonString() }}"}]},"jsonOutput":true,"options":{}},"type":"@n8n/n8n-nodes-langchain.openAi","typeVersion":1.7,"position":[1480,-100],"id":"11229531-1601-4b7c-9c88-59771ea608d6","name":"Categorise","executeOnce":true,"credentials":{"openAiApi":{"id":"wYisOve6Vp7jhAbK","name":"OpenAi account"}}},{"parameters":{"modelId":{"__rl":true,"value":"gpt-4o-mini","mode":"list","cachedResultName":"GPT-4O-MINI"},"messages":{"values":[{"content":"=My Name is Vishal Pandey and I work in Lumiq as Team Lead\n\nGiven the summary of the conversation till now, and the latest message in the  {{ $json.data[1].body.contentType }} format, please generate the response to the conversation.\n\nPlease make sure you only output the response to the conversation without any annotation as it will be directly sent to the user.\n\nConversation Summary :  {{ $json.data[0].response.text }}\n\nLatest Message : {{ $json.data[1].body.content }}\n\n\nReturn the response in the json format in the specific structure defined beloww\n\n\"response\": \n{\n\"subject\": <Subject of the email response>,\n\"body\": <body of the email response in plain text format>\n}\n\n"}]},"jsonOutput":true,"options":{}},"type":"@n8n/n8n-nodes-langchain.openAi","typeVersion":1.7,"position":[1480,160],"id":"f9346316-249d-4d06-a64b-9356bc02005c","name":"Create Draft","credentials":{"openAiApi":{"id":"wYisOve6Vp7jhAbK","name":"OpenAi account"}}},{"parameters":{"numberInputs":4},"type":"n8n-nodes-base.merge","typeVersion":3,"position":[2000,400],"id":"db35510c-42e4-47d0-8180-b02d94e3d492","name":"Merge1"},{"parameters":{"schema":{"__rl":true,"mode":"list","value":"public"},"table":{"__rl":true,"value":"message","mode":"list","cachedResultName":"message"},"columns":{"mappingMode":"defineBelow","value":{"is_read":"={{ $json.data[0].isRead }}","id":"={{ $json.data[0].id }}","created_date_time":"={{ $json.data[0].createdDateTime }}","categories":"={{ [$json.data[2].message.content.category] }}","received_date_time":"={{ $json.data[0].receivedDateTime }}","sent_date_time":"={{ $json.data[0].sentDateTime }}","internet_message_id":"={{ $json.data[0].internetMessageId }}","subject":"={{ $json.data[0].subject }}","body_preview":"={{ $json.data[0].bodyPreview }}","importance":"={{ $json.data[0].importance }}","conversation_id":"={{ $json.data[0].conversationId }}","web_link":"={{ $json.data[0].webLink }}","body_content_type":"={{ $json.data[0].body.contentType }}","body_content":"={{ $json.data[0].body.content }}","sender_name":"={{ $json.data[0].sender.emailAddress.name }}","sender_email":"={{ $json.data[0].sender.emailAddress.address }}","from_name":"={{ $json.data[0].from.emailAddress.name }}","from_email":"={{ $json.data[0].from.emailAddress.address }}","to_recipients":"={{ $json.data[0].toRecipients }}","cc_recipients":"={{ $json.data[0].ccRecipients }}","bcc_recipients":"={{ $json.data[0].bccRecipients }}","reply_to":"={{ $json.data[0].replyTo }}","summary":"={{ $json.data[1].response.text.replaceAll(\"CONCISE SUMMARY:\", \"\") }}","tags":"={{ $json.data[2].message.content.tags }}","draft":"={{ $json.data[3].message.content.response.body }}"},"matchingColumns":["id"],"schema":[{"id":"id","displayName":"id","required":true,"defaultMatch":true,"display":true,"type":"string","canBeUsedToMatch":true,"removed":false},{"id":"created_date_time","displayName":"created_date_time","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":true},{"id":"last_modified_date_time","displayName":"last_modified_date_time","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":true,"removed":false},{"id":"categories","displayName":"categories","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"received_date_time","displayName":"received_date_time","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":true},{"id":"sent_date_time","displayName":"sent_date_time","required":false,"defaultMatch":false,"display":true,"type":"dateTime","canBeUsedToMatch":true},{"id":"has_attachments","displayName":"has_attachments","required":false,"defaultMatch":false,"display":true,"type":"boolean","canBeUsedToMatch":true,"removed":false},{"id":"internet_message_id","displayName":"internet_message_id","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"subject","displayName":"subject","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"body_preview","displayName":"body_preview","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"importance","displayName":"importance","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"conversation_id","displayName":"conversation_id","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"is_read","displayName":"is_read","required":false,"defaultMatch":false,"display":true,"type":"boolean","canBeUsedToMatch":true},{"id":"web_link","displayName":"web_link","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true,"removed":false},{"id":"inference_classification","displayName":"inference_classification","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true,"removed":true},{"id":"body_content_type","displayName":"body_content_type","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"body_content","displayName":"body_content","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"sender_name","displayName":"sender_name","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"sender_email","displayName":"sender_email","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"from_name","displayName":"from_name","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"from_email","displayName":"from_email","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"to_recipients","displayName":"to_recipients","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"cc_recipients","displayName":"cc_recipients","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"bcc_recipients","displayName":"bcc_recipients","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"reply_to","displayName":"reply_to","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"summary","displayName":"summary","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true},{"id":"tags","displayName":"tags","required":false,"defaultMatch":false,"display":true,"type":"array","canBeUsedToMatch":true},{"id":"draft","displayName":"draft","required":false,"defaultMatch":false,"display":true,"type":"string","canBeUsedToMatch":true}]},"options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[2500,440],"id":"7c9224ce-2744-4858-9891-2f2610a6dd50","name":"Postgres","credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{"aggregate":"aggregateAllItemData","options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[2260,480],"id":"18059273-d50a-40cf-ba0b-4ad88625cb21","name":"Aggregate2"},{"parameters":{"mode":"insert","options":{}},"type":"@n8n/n8n-nodes-langchain.vectorStorePGVector","typeVersion":1,"position":[2460,780],"id":"40e8ea0b-c595-4928-849c-db3b6ca32e2f","name":"Postgres PGVector Store","credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}},{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.documentDefaultDataLoader","typeVersion":1,"position":[2600,1000],"id":"92bb4a27-f17d-4870-a502-ba2c708eeb22","name":"Default Data Loader"},{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter","typeVersion":1,"position":[2700,1220],"id":"78e75162-e806-4b7c-b90f-fa7a25f74e70","name":"Recursive Character Text Splitter"},{"parameters":{"options":{}},"type":"@n8n/n8n-nodes-langchain.embeddingsOpenAi","typeVersion":1.1,"position":[2460,1020],"id":"bee3b4da-cefa-4b09-b6ba-88bcff536cf1","name":"Embeddings OpenAI","credentials":{"openAiApi":{"id":"wYisOve6Vp7jhAbK","name":"OpenAi account"}}},{"parameters":{},"type":"n8n-nodes-base.merge","typeVersion":3,"position":[200,-220],"id":"51d66308-6483-4765-90d7-b94bcf48dc45","name":"Merge2"},{"parameters":{"assignments":{"assignments":[{"id":"ce94e8ca-d578-4ad7-8919-2dbc90b2a1c9","name":"createdDateTime","value":"={{ $json.data[0].createdDateTime }}","type":"string"},{"id":"30b79f98-f3de-4aef-8184-555921cc13e7","name":"subject","value":"={{ $json.data[0].subject }}","type":"string"},{"id":"5f764856-2a5c-49b7-bca3-f0c66d4685e0","name":"sender","value":"={{ $json.data[0].sender }}","type":"object"},{"id":"aefc5b53-762f-4c87-a865-e8724daf6203","name":"tags","value":"={{ $json.data[2].message.content.tags }}","type":"array"},{"id":"8745e8d6-8cb8-4be4-8845-9ee22f471ecb","name":"category","value":"={{ $json.data[2].message.content.category }}","type":"string"},{"id":"321d5f9a-64d7-40d3-968d-ca45c2fce3a7","name":"Summary","value":"={{ $json.data[1].response.text }}","type":"string"}]},"options":{}},"type":"n8n-nodes-base.set","typeVersion":3.4,"position":[2860,620],"id":"23dd136b-9d3e-40aa-bc13-e52ba10a38f2","name":"Edit Fields"},{"parameters":{"operation":"select","schema":{"__rl":true,"mode":"list","value":"public"},"table":{"__rl":true,"value":"configuration","mode":"list","cachedResultName":"configuration"},"limit":1,"where":{"values":[{"column":"id","value":"1"}]},"options":{}},"type":"n8n-nodes-base.postgres","typeVersion":2.5,"position":[240,300],"id":"0e02f051-f63e-4757-ba4a-cc5456513ce9","name":"fetch configuration Prompt","credentials":{"postgres":{"id":"6bQtuknHvDNYxelr","name":"Postgres account"}}}],"connections":{"Microsoft Outlook Trigger":{"main":[[{"node":"Postgres1","type":"main","index":0},{"node":"Merge","type":"main","index":1},{"node":"Merge1","type":"main","index":0},{"node":"Merge2","type":"main","index":1},{"node":"fetch configuration Prompt","type":"main","index":0}]]},"Postgres1":{"main":[[{"node":"Merge2","type":"main","index":0}]]},"Aggregate":{"main":[[{"node":"Summarization Chain","type":"main","index":0}]]},"OpenAI Chat Model":{"ai_languageModel":[[{"node":"Summarization Chain","type":"ai_languageModel","index":0}]]},"Summarization Chain":{"main":[[{"node":"Merge","type":"main","index":0},{"node":"Merge1","type":"main","index":1}]]},"Merge":{"main":[[{"node":"Aggregate1","type":"main","index":0}]]},"Aggregate1":{"main":[[{"node":"Create Draft","type":"main","index":0},{"node":"Categorise","type":"main","index":0}]]},"Create Draft":{"main":[[{"node":"Merge1","type":"main","index":3}]]},"Categorise":{"main":[[{"node":"Merge1","type":"main","index":2}]]},"Merge1":{"main":[[{"node":"Aggregate2","type":"main","index":0}]]},"Aggregate2":{"main":[[{"node":"Postgres","type":"main","index":0},{"node":"Edit Fields","type":"main","index":0}]]},"Default Data Loader":{"ai_document":[[{"node":"Postgres PGVector Store","type":"ai_document","index":0}]]},"Recursive Character Text Splitter":{"ai_textSplitter":[[{"node":"Default Data Loader","type":"ai_textSplitter","index":0}]]},"Embeddings OpenAI":{"ai_embedding":[[{"node":"Postgres PGVector Store","type":"ai_embedding","index":0}]]},"Merge2":{"main":[[{"node":"Aggregate","type":"main","index":0}]]},"Edit Fields":{"main":[[{"node":"Postgres PGVector Store","type":"main","index":0}]]},"fetch configuration Prompt":{"main":[[{"node":"Merge","type":"main","index":2}]]}},"settings":{"executionOrder":"v1"},"staticData":{"node:Microsoft Outlook Trigger":{"lastTimeChecked":"2025-01-21T09:01:21.018-05:00"}},"meta":{"templateCredsSetupCompleted":true},"pinData":{},"versionId":"67eabd42-470d-427b-9d42-e6583001f966","triggerCount":1,"tags":[]}]
+[
+    {
+        "createdAt": "2025-01-21T06:39:22.461Z",
+        "updatedAt": "2025-01-28T19:27:11.187Z",
+        "id": "9cyDAxwnZGQxehYC",
+        "name": "API All Category",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "path": "get-category",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "e612883f-0b2f-4a3c-8160-c6d81e25674c",
+                "name": "Webhook",
+                "webhookId": "bd349985-4ea0-4e8f-94cc-348683150cf6"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT DISTINCT (categories) from message;",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    300,
+                    0
+                ],
+                "id": "148cab1a-99f2-42f9-9836-5bf74abb8979",
+                "name": "Postgres",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.executeWorkflowTrigger",
+                "typeVersion": 1,
+                "position": [
+                    20,
+                    160
+                ],
+                "id": "cd251aa6-1e92-480d-ab96-ffe602ea5f88",
+                "name": "Execute Workflow Trigger"
+            },
+            {
+                "parameters": {
+                    "jsCode": "let categories = [\n  {\n    \"categories\": []\n  }\n]\nfor (const item of $input.all()) {\n  categories[0][\"categories\"].push(item.json.categories[0])\n}\n\nreturn categories;"
+                },
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    520,
+                    0
+                ],
+                "id": "54d477bc-3722-4280-8d2f-bcd980fbf05c",
+                "name": "Code",
+                "alwaysOutputData": true
+            }
+        ],
+        "connections": {
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Execute Workflow Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Postgres": {
+                "main": [
+                    [
+                        {
+                            "node": "Code",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "0b196af2-4dc4-4c8a-a45f-2c090b769128",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-22T09:27:03.208Z",
+        "updatedAt": "2025-01-28T19:32:15.632Z",
+        "id": "0lLclNsot3gJcIdO",
+        "name": "API GET Category Tag Preference",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "path": "get-category-tag-preference",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "2bcd3dc3-5ef9-4cb6-be0f-322e44ba89cd",
+                "name": "Webhook",
+                "webhookId": "fa7c376c-7f77-41e0-a8ca-4a14c527f53a"
+            },
+            {
+                "parameters": {
+                    "operation": "select",
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "configuration",
+                        "mode": "list",
+                        "cachedResultName": "configuration"
+                    },
+                    "limit": 1,
+                    "where": {
+                        "values": [
+                            {
+                                "column": "id",
+                                "value": "1"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "e796eab2-d7da-4750-aa48-257a98cf59a0",
+                "name": "Postgres",
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": {
+            "templateCredsSetupCompleted": true
+        },
+        "pinData": {},
+        "versionId": "938db787-22b3-4632-ab1b-22eab1461e12",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-21T19:53:19.208Z",
+        "updatedAt": "2025-01-28T19:33:51.900Z",
+        "id": "yA4oJOzfXvXiB6jo",
+        "name": "Get Draft By Id",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT \n    id AS message_id,\n    subject,\n    draft AS draft_message,\n    sender_name,\n    sender_email,\n    created_date_time,\n    last_modified_date_time\nFROM \n    message\nWHERE \n    id = '{{ $json.query.message_id }}'\n    AND draft IS NOT NULL; -- Ensures only messages with a draft are fetched\n",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "711f3819-b0ad-4802-a5e1-c22e5a06294c",
+                "name": "Postgres",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.executeWorkflowTrigger",
+                "typeVersion": 1,
+                "position": [
+                    -20,
+                    0
+                ],
+                "id": "c0dc6323-ace3-47a2-845e-0fce6d1b712c",
+                "name": "Execute Workflow Trigger"
+            },
+            {
+                "parameters": {
+                    "path": "get-draft-by-id",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    -80,
+                    -180
+                ],
+                "id": "b137a538-16b8-443f-8f29-d63ee8874591",
+                "name": "Webhook",
+                "webhookId": "9323b7c0-fbd9-41e2-8c0c-d84ef80f0882"
+            }
+        ],
+        "connections": {
+            "Execute Workflow Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "2fe75124-8506-4fc4-bc68-4b2edc929ce2",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-21T07:21:16.925Z",
+        "updatedAt": "2025-01-28T19:27:11.187Z",
+        "id": "3vu4056ja4IhGnOM",
+        "name": "Agentic Chat",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+                "typeVersion": 1.1,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "79390179-a73a-4550-a13c-7586e40cf127",
+                "name": "When chat message received",
+                "webhookId": "345f0a46-edbc-4149-9f6b-5a858f1a2bb2"
+            },
+            {
+                "parameters": {
+                    "promptType": "define",
+                    "text": "={{ $json.chatInput || $json.body.chatInput }}",
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.agent",
+                "typeVersion": 1.7,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "064830a7-88aa-4c5d-9efe-c47d5cfe8d42",
+                "name": "AI Agent"
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    280
+                ],
+                "id": "56a2ad10-635b-462a-8857-44ccfbe7745e",
+                "name": "OpenAI Chat Model",
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "sessionIdType": "customKey",
+                    "sessionKey": "{{ $json.sessionId || $json.body.sessionId }}"
+                },
+                "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                "typeVersion": 1.3,
+                "position": [
+                    140,
+                    280
+                ],
+                "id": "d46e519b-3e3f-4ab7-9ac4-73c17c827afe",
+                "name": "Window Buffer Memory"
+            },
+            {
+                "parameters": {
+                    "name": "get_categories",
+                    "description": "Call this tool when user ask about the categories present.",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "9cyDAxwnZGQxehYC",
+                        "mode": "list",
+                        "cachedResultName": "API All Category"
+                    }
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 1.3,
+                "position": [
+                    280,
+                    280
+                ],
+                "id": "6bc99b6d-6f38-4810-9c40-c94bcc671927",
+                "name": "Get Categories",
+                "notesInFlow": true,
+                "notes": "Get all the categories"
+            },
+            {
+                "parameters": {
+                    "name": "unread_emails",
+                    "description": "Call this tool to get all the recent unread emails",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "X7HA4dMNUjqrnTvi",
+                        "mode": "list",
+                        "cachedResultName": "API Last Unread Emails"
+                    }
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 1.3,
+                "position": [
+                    440,
+                    280
+                ],
+                "id": "9ef86e30-a0e3-450b-a979-3697fc9f5a69",
+                "name": "Get unread emails"
+            },
+            {
+                "parameters": {
+                    "name": "email_by_category",
+                    "description": "Call this node to get the emails of any specific category, for this tool to work it expect the category name in the below format,\nin the json format.\n\n{\n  \"category\": \"<category_name>\"\n}",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "trzzCjdYb447Rl6D",
+                        "mode": "list",
+                        "cachedResultName": "emails by category"
+                    },
+                    "specifyInputSchema": true,
+                    "jsonSchemaExample": "{\n\t\"category\": \"<category_name>\"\n}"
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 1.3,
+                "position": [
+                    740,
+                    280
+                ],
+                "id": "275a136e-f090-41eb-9a31-68919d6cd02a",
+                "name": "email by category"
+            },
+            {
+                "parameters": {
+                    "name": "draft_by_message_id",
+                    "description": "Call this tool to get the draft of email by message id",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "yA4oJOzfXvXiB6jo",
+                        "mode": "list",
+                        "cachedResultName": "Email By Id"
+                    },
+                    "specifyInputSchema": true,
+                    "jsonSchemaExample": "{\n\t\"message_id\": \"<message_id>\"\n}"
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 1.3,
+                "position": [
+                    900,
+                    280
+                ],
+                "id": "18ac4fdc-cf19-4bd6-8a87-cbd4e945b07b",
+                "name": "Draft Email By Id"
+            },
+            {
+                "parameters": {
+                    "httpMethod": "POST",
+                    "path": "chat",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    -200
+                ],
+                "id": "c29ea089-113a-455d-b872-5f09eaf5f22b",
+                "name": "Webhook",
+                "webhookId": "9a3d2af6-c8c6-4db6-aa40-c237cd0c174f"
+            },
+            {
+                "parameters": {
+                    "name": "get_tags",
+                    "description": "Call this tool to get the tags present.",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "q93DYBjuCrYRKmTZ",
+                        "mode": "list",
+                        "cachedResultName": "API Get All Tags"
+                    }
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 1.3,
+                "position": [
+                    600,
+                    280
+                ],
+                "id": "a4a876cf-bca6-4a51-b5de-301f120778f4",
+                "name": "Get tags"
+            },
+            {
+                "parameters": {
+                    "name": "Calendar_summary",
+                    "description": "Call this node to get the summary of today calendar events.",
+                    "workflowId": {
+                        "__rl": true,
+                        "value": "WHFctQ43gAm2v6vm",
+                        "mode": "list",
+                        "cachedResultName": "Fetch Calendar"
+                    },
+                    "workflowInputs": {
+                        "mappingMode": "defineBelow",
+                        "value": {},
+                        "matchingColumns": [],
+                        "schema": [],
+                        "attemptToConvertTypes": false,
+                        "convertFieldsToString": false
+                    }
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+                "typeVersion": 2,
+                "position": [
+                    1060,
+                    280
+                ],
+                "id": "803f3f53-f1db-4ad4-9664-f9c09babe224",
+                "name": "Call n8n Workflow Tool"
+            }
+        ],
+        "connections": {
+            "When chat message received": {
+                "main": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "OpenAI Chat Model": {
+                "ai_languageModel": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_languageModel",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Window Buffer Memory": {
+                "ai_memory": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_memory",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Get Categories": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Get unread emails": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "email by category": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Draft Email By Id": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Get tags": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Call n8n Workflow Tool": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "ca582aa3-c05b-45e1-a505-95c16018f167",
+        "triggerCount": 3,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-14T10:49:31.232Z",
+        "updatedAt": "2025-01-28T19:34:32.671Z",
+        "id": "9Dz5czowVEYquoTt",
+        "name": "Email Automation",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "pollTimes": {
+                        "item": [
+                            {
+                                "mode": "everyMinute"
+                            }
+                        ]
+                    },
+                    "output": "fields",
+                    "fields": [
+                        "body",
+                        "subject",
+                        "conversationId",
+                        "from"
+                    ],
+                    "filters": {},
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.microsoftOutlookTrigger",
+                "typeVersion": 1,
+                "position": [
+                    -1140,
+                    320
+                ],
+                "id": "4d8bd8d7-0bd6-4c57-ba0f-0c8da355801c",
+                "name": "Microsoft Outlook Trigger",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "modelId": {
+                        "__rl": true,
+                        "value": "gpt-4o-mini",
+                        "mode": "list",
+                        "cachedResultName": "GPT-4O-MINI"
+                    },
+                    "messages": {
+                        "values": [
+                            {
+                                "content": "=Hi My name is Vishal Pandey,\nI work in Lumiq as team lead, \nI work on blackrock project, my day to day activity is to coordinate with the team. Given the subject and body of the email, I want to provide me the relevancy rating between 1 to 5, 1 being the least important or relevent and 5 being the most important. please provide only single rating for an email.\n\nThere is one exception, if the tone of the email is excalation, where any client is complaining about the project or team, give it the an special rating of 7 this is most important email for me.\n\nBody of the email is in html format, so you need to take care of that.\n\nSubject : {{ $json.subject }}\nBody : {{ $json.body.content }}\n\n\nBelow is the conversationId and id of the email, I want these two also in the response please include these along with the rating.\n\nconversationId : {{ $json.conversationId }}\n\nid : {{ $json.id }}\n\nPlease provide the output in the format\n\ncoversationId : <put conversationId here> \nid : <put id in here>\n\nrelevancyRating : <provide rating in here>\n\n"
+                            }
+                        ]
+                    },
+                    "jsonOutput": true,
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.openAi",
+                "typeVersion": 1.7,
+                "position": [
+                    -580,
+                    380
+                ],
+                "id": "0408c36c-fe6c-4470-be02-bccacb7dccae",
+                "name": "OpenAI",
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "rules": {
+                        "values": [
+                            {
+                                "conditions": {
+                                    "options": {
+                                        "caseSensitive": true,
+                                        "leftValue": "",
+                                        "typeValidation": "strict",
+                                        "version": 2
+                                    },
+                                    "conditions": [
+                                        {
+                                            "leftValue": "={{ $json.message.content.relevancyRating }}",
+                                            "rightValue": 7,
+                                            "operator": {
+                                                "type": "number",
+                                                "operation": "equals"
+                                            }
+                                        }
+                                    ],
+                                    "combinator": "and"
+                                }
+                            },
+                            {
+                                "conditions": {
+                                    "options": {
+                                        "caseSensitive": true,
+                                        "leftValue": "",
+                                        "typeValidation": "strict",
+                                        "version": 2
+                                    },
+                                    "conditions": [
+                                        {
+                                            "id": "ea73c176-f188-4ac9-99bf-b2ca83598925",
+                                            "leftValue": "={{ 0 }}",
+                                            "rightValue": 3,
+                                            "operator": {
+                                                "type": "number",
+                                                "operation": "gt"
+                                            }
+                                        }
+                                    ],
+                                    "combinator": "and"
+                                }
+                            },
+                            {
+                                "conditions": {
+                                    "options": {
+                                        "caseSensitive": true,
+                                        "leftValue": "",
+                                        "typeValidation": "strict",
+                                        "version": 2
+                                    },
+                                    "conditions": [
+                                        {
+                                            "id": "82159c98-f95f-46ee-985e-711453e9c5a6",
+                                            "leftValue": "={{ $json.message.content.relevancyRating }}",
+                                            "rightValue": 3,
+                                            "operator": {
+                                                "type": "number",
+                                                "operation": "lte"
+                                            }
+                                        }
+                                    ],
+                                    "combinator": "and"
+                                }
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.switch",
+                "typeVersion": 3.2,
+                "position": [
+                    -220,
+                    380
+                ],
+                "id": "14d9f9f1-cec7-4326-8ba4-74c82e8c4353",
+                "name": "Switch"
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "options": {
+                            "caseSensitive": true,
+                            "leftValue": "",
+                            "typeValidation": "strict",
+                            "version": 2
+                        },
+                        "conditions": [
+                            {
+                                "id": "6331f501-2537-45be-9a63-5e3e929996c2",
+                                "leftValue": "={{ $json.from.emailAddress.address }}",
+                                "rightValue": "vishal.pandey@lumiq.ai",
+                                "operator": {
+                                    "type": "string",
+                                    "operation": "notEquals"
+                                }
+                            }
+                        ],
+                        "combinator": "and"
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2.2,
+                "position": [
+                    -840,
+                    420
+                ],
+                "id": "ee5f3e7c-65cb-4358-8ad2-b199a8421c01",
+                "name": "Email is not from my email"
+            },
+            {
+                "parameters": {
+                    "operation": "move",
+                    "messageId": {
+                        "__rl": true,
+                        "value": "={{ $json.message.content.id }}",
+                        "mode": "id"
+                    },
+                    "folderId": {
+                        "__rl": true,
+                        "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA=",
+                        "mode": "list",
+                        "cachedResultName": "excalation",
+                        "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3aAAA%3D"
+                    }
+                },
+                "type": "n8n-nodes-base.microsoftOutlook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    200
+                ],
+                "id": "a7761a7e-14fb-49b4-a2bd-8f52eb0dd93d",
+                "name": "Escalation",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "operation": "move",
+                    "messageId": {
+                        "__rl": true,
+                        "value": "={{ $json.message.content.id }}",
+                        "mode": "id"
+                    },
+                    "folderId": {
+                        "__rl": true,
+                        "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA=",
+                        "mode": "list",
+                        "cachedResultName": "ImportantMessages",
+                        "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3WAAA%3D"
+                    }
+                },
+                "type": "n8n-nodes-base.microsoftOutlook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    380
+                ],
+                "id": "d6c4f407-1947-42ec-baa4-2f8e38f062f2",
+                "name": "Important Email",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "operation": "move",
+                    "messageId": {
+                        "__rl": true,
+                        "value": "={{ $json.message.content.id }}",
+                        "mode": "id"
+                    },
+                    "folderId": {
+                        "__rl": true,
+                        "value": "AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P-c1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA=",
+                        "mode": "list",
+                        "cachedResultName": "NotImportantMessage",
+                        "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADAzY2Q3YjY3LTJhYTMtNGJkZC04OGUyLWVkMmEyOTBhNzJlZAAuAAAAAACKcw9lbVRrR4P%2Fc1jNwFFnAQDxlGRbEDSmSa7fWk2Wbb2zAALDXn3YAAA%3D"
+                    }
+                },
+                "type": "n8n-nodes-base.microsoftOutlook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    560
+                ],
+                "id": "2eb48131-3cce-4666-9c04-2bce9050e490",
+                "name": "Not Important Message",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "operation": "reply",
+                    "messageId": {
+                        "__rl": true,
+                        "value": "={{ $json.message.content.id }}",
+                        "mode": "id"
+                    },
+                    "message": "Thank you for bringing it to my notice, I am looking into it, will get back to you on this shortly.\n\nThanks \nVishal Pandey",
+                    "options": {
+                        "saveAsDraft": true
+                    }
+                },
+                "type": "n8n-nodes-base.microsoftOutlook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "6ee5371e-a22b-441f-99f8-bf7c3cc6c47d",
+                "name": "Save the response as draft",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Microsoft Outlook Trigger": {
+                "main": [
+                    []
+                ]
+            },
+            "OpenAI": {
+                "main": [
+                    [
+                        {
+                            "node": "Switch",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Switch": {
+                "main": [
+                    [
+                        {
+                            "node": "Escalation",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Save the response as draft",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Important Email",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Not Important Message",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Email is not from my email": {
+                "main": [
+                    [
+                        {
+                            "node": "OpenAI",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": {
+            "node:Microsoft Outlook Trigger": {
+                "lastTimeChecked": "2025-01-28T14:34:32.686-05:00"
+            }
+        },
+        "meta": null,
+        "pinData": {},
+        "versionId": "e3685788-d4bf-4806-9cb6-a77fd9883aa6",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-21T06:56:31.265Z",
+        "updatedAt": "2025-01-28T19:35:00.557Z",
+        "id": "q93DYBjuCrYRKmTZ",
+        "name": "API Get All Tags",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT DISTINCT UNNEST(tags)\nFROM message\nWHERE tags IS NOT NULL;",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "04628bf1-3850-4ef7-b8ac-2750dc963038",
+                "name": "Postgres",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nlet data =  [{\n  \"tags\": []\n}]\n\nfor (const item of $input.all()) {\n  data[0][\"tags\"].push(item.json.unnest)\n}\n\nreturn data"
+                },
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    440,
+                    0
+                ],
+                "id": "6084cf28-cd3a-4e88-abed-22fbda83ea7a",
+                "name": "Code",
+                "alwaysOutputData": true
+            },
+            {
+                "parameters": {
+                    "path": "get-tags",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "a5e3d699-8ba3-4a6e-ad82-29390d95e5be",
+                "name": "Webhook",
+                "webhookId": "225a35c4-5f97-48f0-b626-2cccb9a45005"
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.executeWorkflowTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    220
+                ],
+                "id": "44de6221-4531-4fb1-a377-08ef0ad9f17c",
+                "name": "Execute Workflow Trigger"
+            }
+        ],
+        "connections": {
+            "Postgres": {
+                "main": [
+                    [
+                        {
+                            "node": "Code",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Execute Workflow Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "4ab6f0ee-debb-4d51-b630-385fbb6e016f",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-21T07:11:55.517Z",
+        "updatedAt": "2025-01-28T19:27:11.187Z",
+        "id": "trzzCjdYb447Rl6D",
+        "name": "emails by category",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "httpMethod": "POST",
+                    "path": "emails-by-category",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "ecfd934c-6f6a-4749-92ce-11dfac28ab56",
+                "name": "Webhook",
+                "webhookId": "6b402d9f-6387-4765-97b6-becd620ba3d8"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT \n    id AS message_id,\n    subject,\n    summary,\n    sender_name,\n    sender_email,\n    sent_date_time,\n    categories,\n    web_link,\n    tags,\n    draft as ai_generated_email_response_draft\nFROM \n    message\nWHERE \n    '{{ $json.query.category.toLowerCase() }}' = ANY(categories)\n    or '{{ $json.query.category.toLowerCase() }}' = ANY(tags)\nORDER BY \n    sent_date_time DESC;",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "414d6721-4e29-4ada-a7ab-25e3e5def00c",
+                "name": "Postgres",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.executeWorkflowTrigger",
+                "typeVersion": 1,
+                "position": [
+                    40,
+                    220
+                ],
+                "id": "ca963a48-8777-4a2f-8c5d-a5e66b6ecad5",
+                "name": "Execute Workflow Trigger"
+            }
+        ],
+        "connections": {
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Execute Workflow Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "b2bf8ab3-ad71-4f91-8b8d-b38c29ee87da",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-21T07:18:16.552Z",
+        "updatedAt": "2025-01-28T19:27:11.187Z",
+        "id": "X7HA4dMNUjqrnTvi",
+        "name": "API Last Unread Emails",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "path": "latest-unread-emails",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "22bf31e7-e5b7-4f1e-8693-025394a67ccf",
+                "name": "Webhook",
+                "webhookId": "8449ee32-3c91-4a08-8f13-84124618317d"
+            },
+            {
+                "parameters": {
+                    "operation": "executeQuery",
+                    "query": "SELECT \n    id AS message_id,\n    subject,\n    summary,\n    sender_name,\n    sender_email,\n    sent_date_time,\n    categories,\n    web_link,\n    tags,\n    draft as ai_generated_email_response_draft\nFROM \n    message\nWHERE \n    is_read = FALSE -- Filters only unread emails\nORDER BY \n    sent_date_time DESC; -- Orders emails by sent time, latest first\n",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "09dc644e-1a83-42de-a007-841895c8edb7",
+                "name": "Postgres",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.executeWorkflowTrigger",
+                "typeVersion": 1,
+                "position": [
+                    -120,
+                    180
+                ],
+                "id": "4b1597e7-53a3-48ce-b02c-f1a773827694",
+                "name": "Execute Workflow Trigger"
+            }
+        ],
+        "connections": {
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Execute Workflow Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "bb40cde5-85fe-4751-8572-a972bcd558b9",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-22T09:28:30.394Z",
+        "updatedAt": "2025-01-28T19:34:43.669Z",
+        "id": "WszbKjRL01cYL2r5",
+        "name": "API POST Category Tag Preference",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "httpMethod": "POST",
+                    "path": "category-tag-preference",
+                    "responseMode": "lastNode",
+                    "responseData": "allEntries",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    0,
+                    0
+                ],
+                "id": "f1bab611-76a3-42a7-9458-ce6248496d8b",
+                "name": "Webhook",
+                "webhookId": "21834462-3da9-4131-bcfb-6a1a9fff2513"
+            },
+            {
+                "parameters": {
+                    "operation": "upsert",
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "configuration",
+                        "mode": "list",
+                        "cachedResultName": "configuration"
+                    },
+                    "columns": {
+                        "mappingMode": "defineBelow",
+                        "value": {
+                            "config_key": "category-tag-config",
+                            "config_value": "={{ $json.body.prompt }}",
+                            "id": 1
+                        },
+                        "matchingColumns": [
+                            "id"
+                        ],
+                        "schema": [
+                            {
+                                "id": "id",
+                                "displayName": "id",
+                                "required": false,
+                                "defaultMatch": true,
+                                "display": true,
+                                "type": "number",
+                                "canBeUsedToMatch": true,
+                                "removed": false
+                            },
+                            {
+                                "id": "config_key",
+                                "displayName": "config_key",
+                                "required": true,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": false
+                            },
+                            {
+                                "id": "config_value",
+                                "displayName": "config_value",
+                                "required": true,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": false
+                            },
+                            {
+                                "id": "created_at",
+                                "displayName": "created_at",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": false,
+                                "removed": true
+                            },
+                            {
+                                "id": "updated_at",
+                                "displayName": "updated_at",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": false,
+                                "removed": true
+                            }
+                        ],
+                        "attemptToConvertTypes": false,
+                        "convertFieldsToString": false
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    220,
+                    0
+                ],
+                "id": "14b63a8c-9908-4180-a495-ffde00f15de6",
+                "name": "Postgres",
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Webhook": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": {
+            "templateCredsSetupCompleted": true
+        },
+        "pinData": {},
+        "versionId": "b8a15d7e-c7ee-49cd-aa2f-0796e0a0090c",
+        "triggerCount": 1,
+        "tags": []
+    },
+    {
+        "createdAt": "2025-01-18T05:22:58.437Z",
+        "updatedAt": "2025-01-28T19:27:11.187Z",
+        "id": "uqjbDkf5gZQvaSFq",
+        "name": "Email Processer",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "pollTimes": {
+                        "item": [
+                            {
+                                "mode": "everyMinute"
+                            }
+                        ]
+                    },
+                    "output": "fields",
+                    "fields": [
+                        "body",
+                        "toRecipients",
+                        "ccRecipients",
+                        "subject",
+                        "internetMessageId",
+                        "conversationId",
+                        "from",
+                        "bodyPreview",
+                        "categories",
+                        "createdDateTime",
+                        "importance",
+                        "isRead",
+                        "lastModifiedDateTime",
+                        "receivedDateTime",
+                        "replyTo",
+                        "sender",
+                        "sentDateTime",
+                        "webLink",
+                        "bccRecipients"
+                    ],
+                    "filters": {},
+                    "options": {
+                        "downloadAttachments": true
+                    }
+                },
+                "type": "n8n-nodes-base.microsoftOutlookTrigger",
+                "typeVersion": 1,
+                "position": [
+                    -260,
+                    20
+                ],
+                "id": "deb514f0-c4ef-4753-9939-8453724fbadd",
+                "name": "Microsoft Outlook Trigger",
+                "credentials": {
+                    "microsoftOutlookOAuth2Api": {
+                        "id": "jImBHIr3dzXoRQP8",
+                        "name": "Microsoft Outlook account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "operation": "select",
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "message",
+                        "mode": "list",
+                        "cachedResultName": "message"
+                    },
+                    "limit": 1,
+                    "where": {
+                        "values": [
+                            {
+                                "column": "conversation_id",
+                                "value": "={{ $json.conversationId }}"
+                            }
+                        ]
+                    },
+                    "sort": {
+                        "values": [
+                            {
+                                "column": "received_date_time",
+                                "direction": "DESC"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    -60,
+                    -220
+                ],
+                "id": "83478a67-e43d-4d51-be3f-ba946a42d15b",
+                "name": "Postgres1",
+                "alwaysOutputData": true,
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "aggregate": "aggregateAllItemData",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.aggregate",
+                "typeVersion": 1,
+                "position": [
+                    380,
+                    -220
+                ],
+                "id": "fa4bc487-8a43-41c9-b9bb-5a9606e1187f",
+                "name": "Aggregate"
+            },
+            {
+                "parameters": {
+                    "options": {
+                        "summarizationMethodAndPrompts": {
+                            "values": {
+                                "summarizationMethod": "stuff",
+                                "prompt": "=I am giving you the summary of the previous conversation and the email received latest, please give the combined summary of the conversation.\n\nIt May Happen that there no prevous conversation in thread so the summary of the previous conversation may be empty.\n\nMake sure you include the key details like who sent the email when it was received who are the intend people it should respond to etc.\n\nPlease give the output simply without any extra text and annotation, also remove the part which is not necesarry like disclamers.\n\n\nPrevious Conversation Summary : {{ $json.data[0].toJsonString().replaceAll(\"{\", \"(\").replaceAll(\"}\", \")\") }}\n\nCurrent Email : \n\n{{ $json.data[1].toJsonString().replaceAll(\"{\", \"(\").replaceAll(\"}\", \")\") }}\n\nGive the summary without any annotation in plain text. And give the output as combined summary of the conversation.\n\nSummary : "
+                            }
+                        }
+                    }
+                },
+                "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+                "typeVersion": 2,
+                "position": [
+                    600,
+                    -220
+                ],
+                "id": "1d6aefcb-67e5-4208-83a2-cdfbaff4bcf3",
+                "name": "Summarization Chain"
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                "typeVersion": 1,
+                "position": [
+                    700,
+                    0
+                ],
+                "id": "9111cab8-c8ff-40ac-9d33-c2c7eead960c",
+                "name": "OpenAI Chat Model",
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "numberInputs": 3
+                },
+                "type": "n8n-nodes-base.merge",
+                "typeVersion": 3,
+                "position": [
+                    980,
+                    120
+                ],
+                "id": "5a88be17-0bf3-4d8c-bf49-1a8c1d4dd311",
+                "name": "Merge"
+            },
+            {
+                "parameters": {
+                    "aggregate": "aggregateAllItemData",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.aggregate",
+                "typeVersion": 1,
+                "position": [
+                    1220,
+                    120
+                ],
+                "id": "a3bee814-c92d-4761-b7bf-bf52c2550ae9",
+                "name": "Aggregate1"
+            },
+            {
+                "parameters": {
+                    "modelId": {
+                        "__rl": true,
+                        "value": "gpt-4o-mini",
+                        "mode": "list",
+                        "cachedResultName": "GPT-4O-MINI"
+                    },
+                    "messages": {
+                        "values": [
+                            {
+                                "content": "={{ $json.data[2].config_value }}\n\nSummary : {{ $json.data[0].response.text }}\nAPI Response : {{ $json.data[1].toJsonString() }}"
+                            }
+                        ]
+                    },
+                    "jsonOutput": true,
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.openAi",
+                "typeVersion": 1.7,
+                "position": [
+                    1480,
+                    -100
+                ],
+                "id": "11229531-1601-4b7c-9c88-59771ea608d6",
+                "name": "Categorise",
+                "executeOnce": true,
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "modelId": {
+                        "__rl": true,
+                        "value": "gpt-4o-mini",
+                        "mode": "list",
+                        "cachedResultName": "GPT-4O-MINI"
+                    },
+                    "messages": {
+                        "values": [
+                            {
+                                "content": "=My Name is Vishal Pandey and I work in Lumiq as Team Lead\n\nGiven the summary of the conversation till now, and the latest message in the  {{ $json.data[1].body.contentType }} format, please generate the response to the conversation.\n\nPlease make sure you only output the response to the conversation without any annotation as it will be directly sent to the user.\n\nConversation Summary :  {{ $json.data[0].response.text }}\n\nLatest Message : {{ $json.data[1].body.content }}\n\n\nReturn the response in the json format in the specific structure defined beloww\n\n\"response\": \n{\n\"subject\": <Subject of the email response>,\n\"body\": <body of the email response in plain text format>\n}\n\n"
+                            }
+                        ]
+                    },
+                    "jsonOutput": true,
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.openAi",
+                "typeVersion": 1.7,
+                "position": [
+                    1480,
+                    160
+                ],
+                "id": "f9346316-249d-4d06-a64b-9356bc02005c",
+                "name": "Create Draft",
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "numberInputs": 4
+                },
+                "type": "n8n-nodes-base.merge",
+                "typeVersion": 3,
+                "position": [
+                    2000,
+                    400
+                ],
+                "id": "db35510c-42e4-47d0-8180-b02d94e3d492",
+                "name": "Merge1"
+            },
+            {
+                "parameters": {
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "message",
+                        "mode": "list",
+                        "cachedResultName": "message"
+                    },
+                    "columns": {
+                        "mappingMode": "defineBelow",
+                        "value": {
+                            "is_read": "={{ $json.data[0].isRead }}",
+                            "id": "={{ $json.data[0].id }}",
+                            "created_date_time": "={{ $json.data[0].createdDateTime }}",
+                            "categories": "={{ [$json.data[2].message.content.category] }}",
+                            "received_date_time": "={{ $json.data[0].receivedDateTime }}",
+                            "sent_date_time": "={{ $json.data[0].sentDateTime }}",
+                            "internet_message_id": "={{ $json.data[0].internetMessageId }}",
+                            "subject": "={{ $json.data[0].subject }}",
+                            "body_preview": "={{ $json.data[0].bodyPreview }}",
+                            "importance": "={{ $json.data[0].importance }}",
+                            "conversation_id": "={{ $json.data[0].conversationId }}",
+                            "web_link": "={{ $json.data[0].webLink }}",
+                            "body_content_type": "={{ $json.data[0].body.contentType }}",
+                            "body_content": "={{ $json.data[0].body.content }}",
+                            "sender_name": "={{ $json.data[0].sender.emailAddress.name }}",
+                            "sender_email": "={{ $json.data[0].sender.emailAddress.address }}",
+                            "from_name": "={{ $json.data[0].from.emailAddress.name }}",
+                            "from_email": "={{ $json.data[0].from.emailAddress.address }}",
+                            "to_recipients": "={{ $json.data[0].toRecipients }}",
+                            "cc_recipients": "={{ $json.data[0].ccRecipients }}",
+                            "bcc_recipients": "={{ $json.data[0].bccRecipients }}",
+                            "reply_to": "={{ $json.data[0].replyTo }}",
+                            "summary": "={{ $json.data[1].response.text.replaceAll(\"CONCISE SUMMARY:\", \"\") }}",
+                            "tags": "={{ $json.data[2].message.content.tags }}",
+                            "draft": "={{ $json.data[3].message.content.response.body }}"
+                        },
+                        "matchingColumns": [
+                            "id"
+                        ],
+                        "schema": [
+                            {
+                                "id": "id",
+                                "displayName": "id",
+                                "required": true,
+                                "defaultMatch": true,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true,
+                                "removed": false
+                            },
+                            {
+                                "id": "created_date_time",
+                                "displayName": "created_date_time",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "last_modified_date_time",
+                                "displayName": "last_modified_date_time",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": true,
+                                "removed": false
+                            },
+                            {
+                                "id": "categories",
+                                "displayName": "categories",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "received_date_time",
+                                "displayName": "received_date_time",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "sent_date_time",
+                                "displayName": "sent_date_time",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "dateTime",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "has_attachments",
+                                "displayName": "has_attachments",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "boolean",
+                                "canBeUsedToMatch": true,
+                                "removed": false
+                            },
+                            {
+                                "id": "internet_message_id",
+                                "displayName": "internet_message_id",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "subject",
+                                "displayName": "subject",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "body_preview",
+                                "displayName": "body_preview",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "importance",
+                                "displayName": "importance",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "conversation_id",
+                                "displayName": "conversation_id",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "is_read",
+                                "displayName": "is_read",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "boolean",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "web_link",
+                                "displayName": "web_link",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true,
+                                "removed": false
+                            },
+                            {
+                                "id": "inference_classification",
+                                "displayName": "inference_classification",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true,
+                                "removed": true
+                            },
+                            {
+                                "id": "body_content_type",
+                                "displayName": "body_content_type",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "body_content",
+                                "displayName": "body_content",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "sender_name",
+                                "displayName": "sender_name",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "sender_email",
+                                "displayName": "sender_email",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "from_name",
+                                "displayName": "from_name",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "from_email",
+                                "displayName": "from_email",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "to_recipients",
+                                "displayName": "to_recipients",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "cc_recipients",
+                                "displayName": "cc_recipients",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "bcc_recipients",
+                                "displayName": "bcc_recipients",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "reply_to",
+                                "displayName": "reply_to",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "summary",
+                                "displayName": "summary",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "tags",
+                                "displayName": "tags",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "array",
+                                "canBeUsedToMatch": true
+                            },
+                            {
+                                "id": "draft",
+                                "displayName": "draft",
+                                "required": false,
+                                "defaultMatch": false,
+                                "display": true,
+                                "type": "string",
+                                "canBeUsedToMatch": true
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    2500,
+                    440
+                ],
+                "id": "7c9224ce-2744-4858-9891-2f2610a6dd50",
+                "name": "Postgres",
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "aggregate": "aggregateAllItemData",
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.aggregate",
+                "typeVersion": 1,
+                "position": [
+                    2260,
+                    480
+                ],
+                "id": "18059273-d50a-40cf-ba0b-4ad88625cb21",
+                "name": "Aggregate2"
+            },
+            {
+                "parameters": {
+                    "mode": "insert",
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+                "typeVersion": 1,
+                "position": [
+                    2460,
+                    780
+                ],
+                "id": "40e8ea0b-c595-4928-849c-db3b6ca32e2f",
+                "name": "Postgres PGVector Store",
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                "typeVersion": 1,
+                "position": [
+                    2600,
+                    1000
+                ],
+                "id": "92bb4a27-f17d-4870-a502-ba2c708eeb22",
+                "name": "Default Data Loader"
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                "typeVersion": 1,
+                "position": [
+                    2700,
+                    1220
+                ],
+                "id": "78e75162-e806-4b7c-b90f-fa7a25f74e70",
+                "name": "Recursive Character Text Splitter"
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                "typeVersion": 1.1,
+                "position": [
+                    2460,
+                    1020
+                ],
+                "id": "bee3b4da-cefa-4b09-b6ba-88bcff536cf1",
+                "name": "Embeddings OpenAI",
+                "credentials": {
+                    "openAiApi": {
+                        "id": "DIPb3EiMFp3p7zu0",
+                        "name": "OpenAi account"
+                    }
+                }
+            },
+            {
+                "parameters": {},
+                "type": "n8n-nodes-base.merge",
+                "typeVersion": 3,
+                "position": [
+                    200,
+                    -220
+                ],
+                "id": "51d66308-6483-4765-90d7-b94bcf48dc45",
+                "name": "Merge2"
+            },
+            {
+                "parameters": {
+                    "assignments": {
+                        "assignments": [
+                            {
+                                "id": "ce94e8ca-d578-4ad7-8919-2dbc90b2a1c9",
+                                "name": "createdDateTime",
+                                "value": "={{ $json.data[0].createdDateTime }}",
+                                "type": "string"
+                            },
+                            {
+                                "id": "30b79f98-f3de-4aef-8184-555921cc13e7",
+                                "name": "subject",
+                                "value": "={{ $json.data[0].subject }}",
+                                "type": "string"
+                            },
+                            {
+                                "id": "5f764856-2a5c-49b7-bca3-f0c66d4685e0",
+                                "name": "sender",
+                                "value": "={{ $json.data[0].sender }}",
+                                "type": "object"
+                            },
+                            {
+                                "id": "aefc5b53-762f-4c87-a865-e8724daf6203",
+                                "name": "tags",
+                                "value": "={{ $json.data[2].message.content.tags }}",
+                                "type": "array"
+                            },
+                            {
+                                "id": "8745e8d6-8cb8-4be4-8845-9ee22f471ecb",
+                                "name": "category",
+                                "value": "={{ $json.data[2].message.content.category }}",
+                                "type": "string"
+                            },
+                            {
+                                "id": "321d5f9a-64d7-40d3-968d-ca45c2fce3a7",
+                                "name": "Summary",
+                                "value": "={{ $json.data[1].response.text }}",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.set",
+                "typeVersion": 3.4,
+                "position": [
+                    2860,
+                    620
+                ],
+                "id": "23dd136b-9d3e-40aa-bc13-e52ba10a38f2",
+                "name": "Edit Fields"
+            },
+            {
+                "parameters": {
+                    "operation": "select",
+                    "schema": {
+                        "__rl": true,
+                        "mode": "list",
+                        "value": "public"
+                    },
+                    "table": {
+                        "__rl": true,
+                        "value": "configuration",
+                        "mode": "list",
+                        "cachedResultName": "configuration"
+                    },
+                    "limit": 1,
+                    "where": {
+                        "values": [
+                            {
+                                "column": "id",
+                                "value": "1"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.postgres",
+                "typeVersion": 2.5,
+                "position": [
+                    240,
+                    300
+                ],
+                "id": "0e02f051-f63e-4757-ba4a-cc5456513ce9",
+                "name": "fetch configuration Prompt",
+                "credentials": {
+                    "postgres": {
+                        "id": "6bQtuknHvDNYxelr",
+                        "name": "Postgres account"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Microsoft Outlook Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres1",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Merge",
+                            "type": "main",
+                            "index": 1
+                        },
+                        {
+                            "node": "Merge1",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Merge2",
+                            "type": "main",
+                            "index": 1
+                        },
+                        {
+                            "node": "fetch configuration Prompt",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Postgres1": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge2",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Aggregate": {
+                "main": [
+                    [
+                        {
+                            "node": "Summarization Chain",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "OpenAI Chat Model": {
+                "ai_languageModel": [
+                    [
+                        {
+                            "node": "Summarization Chain",
+                            "type": "ai_languageModel",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Summarization Chain": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Merge1",
+                            "type": "main",
+                            "index": 1
+                        }
+                    ]
+                ]
+            },
+            "Merge": {
+                "main": [
+                    [
+                        {
+                            "node": "Aggregate1",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Aggregate1": {
+                "main": [
+                    [
+                        {
+                            "node": "Create Draft",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Categorise",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Create Draft": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge1",
+                            "type": "main",
+                            "index": 3
+                        }
+                    ]
+                ]
+            },
+            "Categorise": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge1",
+                            "type": "main",
+                            "index": 2
+                        }
+                    ]
+                ]
+            },
+            "Merge1": {
+                "main": [
+                    [
+                        {
+                            "node": "Aggregate2",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Aggregate2": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Edit Fields",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Default Data Loader": {
+                "ai_document": [
+                    [
+                        {
+                            "node": "Postgres PGVector Store",
+                            "type": "ai_document",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Recursive Character Text Splitter": {
+                "ai_textSplitter": [
+                    [
+                        {
+                            "node": "Default Data Loader",
+                            "type": "ai_textSplitter",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Embeddings OpenAI": {
+                "ai_embedding": [
+                    [
+                        {
+                            "node": "Postgres PGVector Store",
+                            "type": "ai_embedding",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Merge2": {
+                "main": [
+                    [
+                        {
+                            "node": "Aggregate",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Edit Fields": {
+                "main": [
+                    [
+                        {
+                            "node": "Postgres PGVector Store",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "fetch configuration Prompt": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge",
+                            "type": "main",
+                            "index": 2
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": {
+            "node:Microsoft Outlook Trigger": {
+                "lastTimeChecked": "2025-01-28T14:12:58.511-05:00"
+            }
+        },
+        "meta": {
+            "templateCredsSetupCompleted": true
+        },
+        "pinData": {},
+        "versionId": "f7c2e52c-c507-475f-a4f2-b85c770df7af",
+        "triggerCount": 1,
+        "tags": []
+    }
+]

@@ -2,3 +2,14 @@ docker run -e WEBHOOK_URL='https://n8n.vishalpandey.co.in/' -d --restart=always 
 
 
 Deepak semar
+
+
+
+// Export
+n8n export:workflow --all
+
+// Import
+n8n export:credentials --all --decrypted
+
+// Enable all workflow
+n8n update:workflow --all --active=true
